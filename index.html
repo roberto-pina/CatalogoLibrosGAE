@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catalogo de Libros</title>
+</head>
+<body>
+ 
+    <form action="javascript:void(0);">
+        <h2>Libros</h2>
+        <div><input id="listLibro" type="submit" value="Mostrar Catalogo"></div>
+    </form>
+	<br/>
+    <div id="mostrarCatalogoResult"></div>
+    
+    <form action="javascript:void(0);">
+      <h2>Agregar Nuevo Libro</h2>
+         <div><input id="txtTitulo" placeholder="Titulo"></input></div>
+         <div><input id="txtAutor" placeholder="Autor"></input></div>
+		 <div><input id="numAnio" placeholder="Ano de publicacion"></input></div>
+		 <div><input id="txtEditorial" placeholder="Editorial"></input></div>
+         <div><input id="insertLibro" type="submit" value="Agregar"></div>
+    </form>
+    
+    <form action="javascript:void(0);">
+      <h2>Editar Libro</h2>
+         <div><input id="editLibroId" placeholder="ID"></input></div>
+         <div><input id="editTitulo" placeholder="Titulo"></input></div>
+         <div><input id="editAutor" placeholder="Autor"></input></div>
+		 <div><input id="editAnio" placeholder="Ano de publicacion"></input></div>
+		 <div><input id="editEditorial" placeholder="Editorial"></input></div>
+         <div><input id="updateLibro" type="submit" value="Actualizar"></div>
+    </form>
+    
+    <form action="javascript:void(0);">
+      <h2>Eliminar Libro</h2>
+         <div><input id="libroId" placeholder="ID"></input></div>
+         <div><input id="deleteLibro" type="submit" value="Eliminar"></div>
+    </form>
+    
+
+    <script type="text/javascript">
+        function init() {
+
+                //gapi.client.load('libroendpoint', 'v1', null, 'http://localhost:8888/_ah/api/');
+				gapi.client.load('libroendpoint', 'v1', null, 'https://catalogoderoberto1.appspot.com/_ah/api/');
+                document.getElementById('listLibro').onclick = function() {
+                    mostrarCatalogo();
+                }
+                
+                document.getElementById('insertLibro').onclick = function() {
+                    agregar();
+					limpiar();
+                }
+                
+                document.getElementById('updateLibro').onclick = function() {
+                    actualizar();
+					limpiar();
+                }
+                
+                document.getElementById('deleteLibro').onclick = function() {
+                    eliminar();
+					limpiar();
+                }
+        }
+        
+        //Funcion mostrarCatalogo
+        function mostrarCatalogo() {
+                gapi.client.libroendpoint.listLibro().execute(function(resp) {
+                        if (!resp.code) {
+                                resp.items = resp.items || [];
+                                var result = "";
+                                for (var i=0;i<resp.items.length;i++) {
+                                        result = result+ resp.items[i].titulo + "..." + "<b>" + resp.items[i].autor + "</b>" + "..." + resp.items[i].anio + "..." + "<b>" + resp.items[i].editorial + "</b>" + "..." + "[" + resp.items[i].id + "]" + "<br/>";
+                                }
+                                document.getElementById('mostrarCatalogoResult').innerHTML = result;
+                        }
+                });
+        }
+        
+        //Funcion agregar
+        function agregar() {
+                //Validando entradas de datos
+                var _Titulo = document.getElementById('txtTitulo').value;
+                var _Autor = document.getElementById('txtAutor').value;
+				var _Anio = document.getElementById('numAnio').value;
+				var _Editorial = document.getElementById('txtEditorial').value;
+                
+                //Construyendo el objeto
+                var requestData = {};
+                requestData.titulo = _Titulo;
+                requestData.autor = _Autor;
+				requestData.anio = _Anio;
+				requestData.editorial = _Editorial;
+                gapi.client.libroendpoint.insertLibro(requestData).execute(function(resp) {
+                        if (!resp.code) {
+                                //Just logging to console now, you can do your check here/display message
+                                console.log(resp.id + ":" + resp.titulo + ":" + resp.autor + ":" + resp.anio + ":" + resp.editorial);
+                        }
+                });
+        }
+        
+        //Funcion actualizar
+        function actualizar() {
+                //Validando entradas de datos
+                var _ID = document.getElementById("editLibroId").value;
+                var _Titulo = document.getElementById('editTitulo').value;
+                var _Autor = document.getElementById('editAutor').value;
+				var _Anio = document.getElementById('editAnio').value;
+				var _Editorial = document.getElementById('editEditorial').value;
+                
+                //Editando el objeto
+                var requestData = {};
+                requestData.id = _ID;
+                requestData.titulo = _Titulo;
+                requestData.autor = _Autor;
+				requestData.anio = _Anio;
+				requestData.editorial = _Editorial;
+                gapi.client.libroendpoint.updateLibro(requestData).execute(function(resp) {
+                        if (!resp.code) {
+                                //Just logging to console now, you can do your check here/display message
+                                console.log(resp.id + ":" + resp.titulo + ":" + resp.autor + ":" + resp.anio + ":" + resp.editorial);
+                        }
+                });
+        }
+        
+        //Funcion eliminar
+        function eliminar() {
+                //Validando entradas de datos
+                var _ID = document.getElementById('libroId').value;
+                
+                //Eliminando el objeto
+                var requestData = {};
+                requestData.id = _ID;
+                console.log(requestData);
+                gapi.client.libroendpoint.removeLibro(requestData).execute(function(resp) {
+                        //Just logging to console now, you can do your check here/display message
+                        console.log(resp);
+                });
+        }
+		
+		//Funcion para limpiar los campos
+		function limpiar() {
+				document.getElementById("txtTitulo").value='';
+				document.getElementById("txtAutor").value='';
+				document.getElementById("numAnio").value='';
+				document.getElementById("txtEditorial").value='';
+				document.getElementById("editLibroId").value='';
+				document.getElementById("editTitulo").value='';
+				document.getElementById("editAutor").value='';
+				document.getElementById("editAnio").value='';
+				document.getElementById("editEditorial").value='';
+				document.getElementById("libroId").value='';
+		}
+        
+    </script>
+    <script src="https://apis.google.com/js/client.js?onload=init"></script>
+
+</body>
+</html>
